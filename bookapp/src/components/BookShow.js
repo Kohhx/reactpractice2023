@@ -1,9 +1,16 @@
-import React from 'react'
+import React from "react";
 
-const BookShow = () => {
+const BookShow = ({ book, onDelete }) => {
   return (
-    <div>BookShow</div>
-  )
-}
+    <div className="book-show">
+      {book.title}
+      <div className="actions">
+        <button className="delete" onClick={() => onDelete(book.id)}>
+          Delete
+        </button>
+      </div>
+    </div>
+  );
+};
 
-export default BookShow
+export default BookShow;
