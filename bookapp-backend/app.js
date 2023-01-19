@@ -12,6 +12,9 @@ const booksRoutes = require("./routes/books");
 // Initialize Express
 const app = express();
 
+// create application/x-www-form-urlencoded parser
+app.use(bodyParser.json())
+
 // Mongoose Initialize and then run server
 try {
   // Connect to the MongoDB cluster
@@ -35,10 +38,18 @@ app.get("/", (req, res) => {
 });
 app.use("/books", booksRoutes);
 
-const PORT = process.env.PORT || 5000;
-// mongoose.connect(process.env.MONGO_URI, () => {
 
-// });
+// Error Handling Middleware
+app.use((error, req, res, next) => {
+  if (res.headerSent){
+    return next(error);
+  }
+  res.status(error.code || 500);
+  res.json({message: error.message || "Unknown error occured!"})
+})
+
+// Run Server and listen to port
+const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
     console.log(`Server Started at PORT ${PORT}....`);
   });

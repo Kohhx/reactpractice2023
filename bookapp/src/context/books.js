@@ -50,6 +50,7 @@ const Provider = ({ children }) => {
     setBooks(updatedBooks);
   };
 
+  // Set all the value to share
   const valueToShare = {
     books,
     handleCreate: handleCreate,
