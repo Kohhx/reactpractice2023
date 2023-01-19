@@ -2,18 +2,6 @@
 const Book = require("../models/book");
 const HttpError = require("../models/http-error");
 
-// Dummy Data
-DUMMYDATA = [
-  {
-    id: 1,
-    title: "harry",
-  },
-  {
-    id: 2,
-    title: "matrix",
-  },
-];
-
 // Fetch all the books
 exports.index = async (req, res, next) => {
   let fetchedBooks;
@@ -69,25 +57,46 @@ exports.create = async (req, res, next) => {
   res.status(201).json({ book: createdBook });
 };
 
-// Edit a book
+// Edit a book by ID
 exports.edit = async (req, res, next) => {
   const bookId = req.params.id;
+  const { title } = req.body;
+
+  // Find the book by ID
+  let book;
+  try {
+    book = await Book.findById(bookId);
+  } catch (error) {
+    return next(new HttpError("Something went wrong. Error updating book", 500));
+  }
+
+  // Update the field here
+  book.title = title;
+
+  // Save after updating
+  try {
+    await book.save();
+    console.log("Book Updated successfully!");
+  } catch (error) {
+    return next(new HttpError("Something went wrong. Error updating book", 500));
+  }
+
+  res.status(201).json(book.toObject({ getters: true }));
 };
 
-// Delete a book
+// Delete a book by ID
 exports.delete = async (req, res, next) => {
   const bookId = req.params.id;
 
   let books;
   try {
-    await Book.deleteOne({_id: bookId})
-    console.log("Book deleted successfully!")
+    await Book.deleteOne({ _id: bookId });
+    console.log("Book deleted successfully!");
   } catch (error) {
-    return next(new HttpError("Error deleting book", 500))
+    return next(new HttpError("Error deleting book", 500));
   }
 
-  res.status(201).json({Message: "Book deleted successfully!"})
-
+  res.status(201).json({ Message: "Book deleted successfully!" });
 };
 
 // Export multiple functions (Examples)
