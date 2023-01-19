@@ -9,7 +9,11 @@ const Provider = ({ children }) => {
 
   const fetchBooks = async () => {
     const response = await axios.get("http://localhost:5000/books");
-    setBooks(response.data);
+    const fetchedBooks_map = response.data.map((book) => {
+      return { ...book, id: book._id };
+    });
+    setBooks(fetchedBooks_map);
+    console.log("ALl Book", fetchedBooks_map);
   };
 
   useEffect(() => {
@@ -22,19 +26,25 @@ const Provider = ({ children }) => {
       const response = await axios.post("http://localhost:5000/books/create", {
         title,
       });
-console.log(response.data)
+      console.log(response.data);
       setBooks([...books, response.data]);
     } catch (error) {
-      throw (error)
+      throw error;
     }
   };
 
   // Delete Book by ID
-  const deleteBookById = (id) => {
-    const updatedBooks = books.filter((book) => {
-      return book.id !== id;
-    });
-    setBooks(updatedBooks);
+  const deleteBookById = async (id) => {
+    console.log(id);
+    try {
+      await axios.delete(`http://localhost:5000/books/${id}`);
+      const updatedBooks = books.filter((book) => {
+        return book.id !== id;
+      });
+      setBooks(updatedBooks);
+    } catch (error) {
+      throw error;
+    }
   };
 
   // Edit Book by ID

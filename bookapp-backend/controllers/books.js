@@ -1,4 +1,5 @@
 // Import Models to be use in this controller
+const book = require("../models/book");
 const Book = require("../models/book");
 const HttpError = require("../models/http-error");
 

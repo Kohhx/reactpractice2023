@@ -10,6 +10,8 @@ const bookSchema = new Schema({
   }
 })
 
+bookSchema.set('toObject', { getters: true });
+
 console.log("Book model created")
 
 module.exports = mongoose.model('books', bookSchema);
