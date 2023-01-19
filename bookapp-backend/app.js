@@ -5,17 +5,33 @@ require("dotenv").config();
 
 // Import Models
 require("./models/book");
+const HttpError = require("./models/http-error");
 
 // Import Routes
 const booksRoutes = require("./routes/books");
 
-// Initialize Express
+/**
+ * =============================================================================
+ * Initialize App with express
+ * =============================================================================
+ */
+
 const app = express();
 
-// create application/x-www-form-urlencoded parser
-app.use(bodyParser.json())
+/**
+ * =============================================================================
+ * Body Parser middleware to parse Incoming JSON
+ * =============================================================================
+ */
 
-// Mongoose Initialize and then run server
+app.use(bodyParser.json());
+
+/**
+ * =============================================================================
+ * Mongoose Initialize and then run server
+ * =============================================================================
+ */
+
 try {
   // Connect to the MongoDB cluster
   mongoose.connect(
@@ -31,25 +47,45 @@ const dbConnection = mongoose.connection;
 dbConnection.on("error", (err) => console.log(`Connection error ${err}`));
 dbConnection.once("open", () => console.log("Connected to DB!"));
 
+/**
+ * =============================================================================
+ * Routes
+ * =============================================================================
+ */
 
-// Routes
 app.get("/", (req, res) => {
   res.send("Node Webserver...");
 });
 app.use("/books", booksRoutes);
 
+/**
+ * =============================================================================
+ * Error Handling
+ * =============================================================================
+ */
 
-// Error Handling Middleware
+// Error handling main (if no error specified in controller)
+app.use((req, res, next) => {
+  const error = new HttpError("Could not find this route", 404);
+  throw error;
+});
+
+// Our own Error Handling Middleware
 app.use((error, req, res, next) => {
-  if (res.headerSent){
+  if (res.headerSent) {
     return next(error);
   }
   res.status(error.code || 500);
-  res.json({message: error.message || "Unknown error occured!"})
-})
+  res.json({ message: error.message || "Unknown error occured!" });
+});
 
-// Run Server and listen to port
+/**
+ * =============================================================================
+ * Listen to PORT and run server
+ * =============================================================================
+ */
+
 const PORT = process.env.PORT || 5000;
-  app.listen(PORT, () => {
-    console.log(`Server Started at PORT ${PORT}....`);
-  });
+app.listen(PORT, () => {
+  console.log(`Server Started at PORT ${PORT}....`);
+});
