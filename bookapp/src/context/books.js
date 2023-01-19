@@ -13,7 +13,6 @@ const Provider = ({ children }) => {
       return { ...book, id: book._id };
     });
     setBooks(fetchedBooks_map);
-    console.log("ALl Book", fetchedBooks_map);
   };
 
   useEffect(() => {
@@ -48,14 +47,21 @@ const Provider = ({ children }) => {
   };
 
   // Edit Book by ID
-  const editBookByID = (id, title) => {
-    const updatedBooks = books.map((book) => {
-      if (book.id === id) {
-        return { ...book, title };
-      }
-      return book;
-    });
-    setBooks(updatedBooks);
+  const editBookByID = async (id, title) => {
+    try {
+      const response = await axios.patch(`http://localhost:5000/books/${id}`, {
+        title,
+      });
+      const updatedBooks = books.map((book) => {
+        if (book.id === id) {
+          return { ...book, ...response.data };
+        }
+        return book;
+      });
+      setBooks(updatedBooks);
+    } catch (error) {
+      throw error;
+    }
   };
 
   // Set all the value to share
