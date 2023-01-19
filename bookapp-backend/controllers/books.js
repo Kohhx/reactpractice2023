@@ -15,6 +15,7 @@ exports.index = async (req, res, next) => {
     return next(new HttpError("No books found", 404));
   }
 
+  // res.status(201).json(fetchedBooks.toObject({getter: true}));
   res.status(201).json(fetchedBooks);
 };
 
@@ -54,7 +55,7 @@ exports.create = async (req, res, next) => {
     return next(err);
   }
   console.log("Book created successfully!");
-  res.status(201).json({ book: createdBook });
+  res.status(201).json(createdBook.toObject({ getters: true }));
 };
 
 // Edit a book by ID
@@ -67,7 +68,9 @@ exports.edit = async (req, res, next) => {
   try {
     book = await Book.findById(bookId);
   } catch (error) {
-    return next(new HttpError("Something went wrong. Error updating book", 500));
+    return next(
+      new HttpError("Something went wrong. Error updating book", 500)
+    );
   }
 
   // Update the field here
@@ -78,7 +81,9 @@ exports.edit = async (req, res, next) => {
     await book.save();
     console.log("Book Updated successfully!");
   } catch (error) {
-    return next(new HttpError("Something went wrong. Error updating book", 500));
+    return next(
+      new HttpError("Something went wrong. Error updating book", 500)
+    );
   }
 
   res.status(201).json(book.toObject({ getters: true }));

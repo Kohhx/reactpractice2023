@@ -1,34 +1,32 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
 // Create context
 const BooksContext = createContext();
 
 const Provider = ({ children }) => {
-  // Dummy Book List
-  const dummyData = [
-    {
-      id: Math.round(Math.random() * 999),
-      title: "aaaa",
-    },
-    {
-      id: Math.round(Math.random() * 999),
-      title: "bbbb",
-    },
-    {
-      id: Math.round(Math.random() * 999),
-      title: "cccc",
-    },
-  ];
+  const [books, setBooks] = useState([]);
 
-  const [books, setBooks] = useState(dummyData);
+  const fetchBooks = async () => {
+    const response = await axios.get("http://localhost:5000/books");
+    setBooks(response.data);
+  };
+
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
   // Create a book
-  const handleCreate = (title) => {
-    const newBook = {
-      id: Math.round(Math.random() * 999),
-      title,
-    };
-    setBooks([...books, newBook]);
+  const handleCreate = async (title) => {
+    try {
+      const response = await axios.post("http://localhost:5000/books/create", {
+        title,
+      });
+console.log(response.data)
+      setBooks([...books, response.data]);
+    } catch (error) {
+      throw (error)
+    }
   };
 
   // Delete Book by ID
@@ -56,8 +54,12 @@ const Provider = ({ children }) => {
     handleCreate: handleCreate,
     deleteBookById: deleteBookById,
     editBookByID: editBookByID,
-  }
-  return <BooksContext.Provider value={valueToShare}>{children}</BooksContext.Provider>;
+  };
+  return (
+    <BooksContext.Provider value={valueToShare}>
+      {children}
+    </BooksContext.Provider>
+  );
 };
 
 export default BooksContext;
