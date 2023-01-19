@@ -30,15 +30,16 @@ exports.index = async (req, res, next) => {
   res.status(201).json(fetchedBooks);
 };
 
-// Fetch single book to show
+// Fetch single book to show by ID
 exports.show = async (req, res, next) => {
-  const bookId = +req.params.id;
-  // const book = DUMMYDATA.find((book) => book.id === bookId);
+  const bookId = req.params.id;
   let book;
   try {
-    book = await Book.findById(ObjectId.fromString( bookId ));
+    book = await Book.findById(bookId);
   } catch (error) {
-    return next(error);
+    return next(
+      new HttpError("Something went wrong, could not find a book", 500)
+    );
   }
   if (!book) {
     // Sample of throwing error with a custom error class model
@@ -49,7 +50,7 @@ exports.show = async (req, res, next) => {
       new HttpError("Could not find a book for the provided ID", 404)
     );
   }
-  res.json( book );
+  res.status(201).json(book.toObject({ getters: true }));
 };
 
 // Create a book
@@ -70,14 +71,24 @@ exports.create = async (req, res, next) => {
 
 // Edit a book
 exports.edit = async (req, res, next) => {
-  const bookId = +req.params.id;
-}
-
+  const bookId = req.params.id;
+};
 
 // Delete a book
 exports.delete = async (req, res, next) => {
-  const bookId = +req.params.id;
-}
+  const bookId = req.params.id;
+
+  let books;
+  try {
+    await Book.deleteOne({_id: bookId})
+    console.log("Book deleted successfully!")
+  } catch (error) {
+    return next(new HttpError("Error deleting book", 500))
+  }
+
+  res.status(201).json({Message: "Book deleted successfully!"})
+
+};
 
 // Export multiple functions (Examples)
 // exports.index = index;

@@ -9,8 +9,8 @@ router.post("/create", booksController.create);
 
 router.get("/:id", booksController.show);
 
-router.patch("/edit/':id", booksController.edit);
+router.patch("/:id", booksController.edit);
 
-router.delete("/':id", booksController.delete);
+router.delete("/:id", booksController.delete);
 
 module.exports = router;
